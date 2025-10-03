@@ -1,1 +1,58 @@
 
+name: Build, Sign & Release (Windows)
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch: {}
+
+jobs:
+  win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          pip install -r requirements.txt pyinstaller
+
+      - name: Build exe
+        run: |
+          pyinstaller -y build/pyinstaller.spec
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Restore PFX
+        if: ${{ secrets.WIN_CERT_PFX && secrets.WIN_CERT_PWD }}
+        shell: pwsh
+        run: |
+          [IO.File]::WriteAllBytes("code-signing.pfx",[Convert]::FromBase64String("${{ secrets.WIN_CERT_PFX }}"))
+
+      - name: Sign dist binaries
+        if: ${{ secrets.WIN_CERT_PFX && secrets.WIN_CERT_PWD }}
+        shell: pwsh
+        run: |
+          pwsh -File scripts\sign.ps1 -PfxPath code-signing.pfx -PfxPassword "${{ secrets.WIN_CERT_PWD }}" -TargetGlob "dist\**\*.*"
+
+      - name: Build Installer (Inno Setup)
+        run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\OracleLotteryPredictor.iss'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-dist
+          path: |
+            dist/
+            Output/
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            Output/OracleLotteryPredictorSetup.exe
