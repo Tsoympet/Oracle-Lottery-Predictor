@@ -1,0 +1,12 @@
+
+__pycache__/
+*.pyc
+dist/
+build/
+Output/
+reports_out/
+data/
+*.pfx
+.code-workspace
+.vscode/
+.idea/
