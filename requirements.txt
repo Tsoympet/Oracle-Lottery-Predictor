@@ -1,0 +1,13 @@
+
+pandas
+numpy
+plotly
+matplotlib
+PySide6
+ortools
+optuna
+requests
+beautifulsoup4
+lxml
+sentry-sdk
+kaleido

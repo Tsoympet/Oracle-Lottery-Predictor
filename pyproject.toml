@@ -1,0 +1,34 @@
+
+[project]
+name = "oracle-lottery-predictor"
+version = "1.0.0"
+description = "Oracle Lottery Predictor: Bayesian+MC ensemble with CP-SAT optimization and adaptive policy."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name="Oracle Lottery Predictor Team"}]
+dependencies = [
+    "pandas",
+    "numpy",
+    "plotly",
+    "matplotlib",
+    "PySide6",
+    "ortools",
+    "optuna",
+    "requests",
+    "beautifulsoup4",
+    "lxml",
+]
+
+[project.scripts]
+olp-import-history = "oracle_lottery.data.history_importer:main"
+olp-tune = "oracle_lottery.cli.tune:main"
+olp-repredict = "oracle_lottery.cli.repredict:main"
+olp-scenarios = "oracle_lottery.cli.scenarios:main"
+olp-backtest = "oracle_lottery.cli.backtest:main"
+olp-select-mc-luck = "oracle_lottery.cli.select_mc_luck:main"
+olp-predict = "oracle_lottery.cli.predict:main"
+olp-features = "oracle_lottery.cli.features:main"
+olp-fetch-opap = "oracle_lottery.cli.fetch_opap:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
